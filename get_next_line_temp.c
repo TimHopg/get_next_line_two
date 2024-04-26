@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_temp.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: thopgood <thopgood@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/24 20:04:39 by timhopgood        #+#    #+#             */
-/*   Updated: 2024/04/26 18:09:00 by thopgood         ###   ########.fr       */
+/*   Updated: 2024/04/26 18:22:58 by thopgood         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -334,28 +334,17 @@ int	ft_populate_list(t_list **list, int fd)
 		// ! deal with a failure on the > 1st call
 		if (bytes_read == -1)
 		{
-			// ! deallocate properly
-			// ft_trim_list(list);
 			ft_deallocate_list(list);
 			free(buffer);
 			return (-1);
-			// return (free(buffer));
 		}
-		// if no bytes are read ie end of file
 		else if (bytes_read == 0)
 			return ((free(buffer)), 0);
-		// terminate the buffer string
 		buffer[bytes_read] = '\0';
-		// appends the new buffer string to the list
 		ft_list_append(list, buffer);
 	}
 	return (0);
 }
-
-/*
- *
- *
- */
 
 char	*get_next_line(int fd)
 {
@@ -364,103 +353,14 @@ char	*get_next_line(int fd)
 	char			*next_line;
 	int				read_fail;
 
-	// if fd failed, buffer_size is 0 or less or read fails, return null
-	// if (/* fd < 0 || */ BUFFER_SIZE <= 0)
-	// 	return (NULL);
-	// ! if read fails on subsequent calls, memory is not being freed correctly
-	// if (read(fd, &next_line, 0) <= 0)
-	// {
-	// 	// if (list != NULL)
-	// 	// 	ft_dealloc_all(&list, NULL, NULL);
-	// 	return (NULL);
-	// }
-	// send static list and fd to populate list
-	printf("check one\n");
 	read_fail = ft_populate_list(&list, fd);
-	printf("check two\n");
-	// printf("%d rf\n", read_fail);
-		// return (NULL);
-	// if list not created, exit program
-	// ! is memory being freed correctly here?
-	// if (list == NULL || read_fail == -1)
-	// 	return (ft_deallocate_list(&list), NULL);
-
 	if (list == NULL)
 		return (NULL);
-
-	printf("check three\n");
-
-	// this part calculates the length of the string to (malloc and) returns
 	next_line_length = ft_findnewline(list, '\n', LENGTH);
 	next_line = malloc(next_line_length + 1);
 	if (next_line == NULL)
-		// ! also free here?
 		return (NULL);
-	// sends list and malloc'd next_line to copy the string from the list
-	// ! copy string can be sent next_line length
 	ft_copy_string(list, next_line);
-	// copy_str(list, next_line);
 	ft_trim_list(&list, read_fail);
 	return (next_line);
-}
-
-// ! segfault in deallocate
-// ! could deallocate list and buffer separately
-// ! is returning -1 from functions necessary? Check
-
-/* int	main(void)
-{
-	int		fd;
-	char	*buffer;
-	int		lines_read;
-
-	lines_read = 1;
-	fd = open("test.txt", O_RDONLY);
-	while ((buffer = get_next_line(fd)))
-		printf("%d->%s\n", lines_read++, buffer);
-	return (0);
-} */
-
-// fd = open("test.txt", O_RDWR | O_CREAT);
-
-// #include <stdio.h>
-// #include <fcntl.h>
-
-// int	main(void)
-// {
-// 	int fd;
-// 	char *next_line;
-// 	int count;
-
-//     count = 0;
-//     fd = open("test.txt", O_RDONLY);
-//     next_line = get_next_line(fd);
-//     count ++;
-// 	while ()
-//     printf("[%d]: %s\n", count, next_line);
-//     close(fd);
-// 	return (0);
-// }
-
-int main()
-{
-	int fd;
-	char *line;
-	int lines;
-
-	lines = 1;
-	fd = open("test.txt", O_RDONLY);
-
-	line = get_next_line(fd);
-	printf("%d->%s\n", lines++, line);
-	line = get_next_line(fd);
-	printf("%d->%s\n", lines++, line);
-	line = get_next_line(fd);
-	printf("%d->%s\n", lines++, line);
-	line = get_next_line(fd);
-	printf("%d->%s\n", lines++, line);
-	line = get_next_line(fd);
-	printf("%d->%s\n", lines++, line);
-	// line = get_next_line(-1);
-	// printf("%d->%s\n", lines++, line);
 }
