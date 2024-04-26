@@ -6,7 +6,7 @@
 /*   By: timhopgood <timhopgood@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/24 20:04:39 by timhopgood        #+#    #+#             */
-/*   Updated: 2024/04/26 13:53:51 by timhopgood       ###   ########.fr       */
+/*   Updated: 2024/04/26 16:19:48 by timhopgood       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,59 +218,95 @@ void	ft_copy_string(t_list *list, char *string)
 	}
 	string[k] = '\0';
 }
-
-void	ft_dealloc_all(t_list **list, t_list *overflow_node, char *buffer)
+void	ft_dealloc_all(t_list **list, t_list *overflow_node, char *overflow_string, int read_fail)
 {
 	t_list	*temp_node;
+	t_list	*curr_node;
 
-	if (*list == NULL)
-		return ;
-	while (*list)
+	curr_node = *list;
+	temp_node = NULL;
+	// frees current list
+	while (curr_node)
 	{
-		temp_node = (*list)->next;
-		free((*list)->string);
-		free(*list);
-		*list = temp_node;
+		temp_node = curr_node->next;
+		free(curr_node->string);
+		free(curr_node);
+		curr_node = temp_node;
 	}
+	// sets list pointer to null
 	*list = NULL;
-	if (overflow_node->string[0] && overflow_node)
+	// if overflow node and string exist, overflow node becomes new list
+	if (overflow_node->string[0] && overflow_node && read_fail != -1)
 	{
 		*list = overflow_node;
 	}
+	// other wise frees both overflow_node and overflow_string 
 	else
 	{
-		free(buffer);
+		free(overflow_string);
 		free(overflow_node);
 	}
 }
 
-void	ft_trim_list(t_list **list)
+// void	ft_dealloc_all(t_list **list, t_list *overflow_node, char *buffer)
+// {
+// 	t_list	*temp_node;
+// 	t_list	*curr_node;
+
+// 	curr_node = *list;
+// 	temp_node = NULL;
+// 	while (curr_node)
+// 	{
+// 		temp_node = curr_node->next;
+// 		free(curr_node->string);
+// 		free(curr_node);
+// 		curr_node = temp_node;
+// 	}
+// 	*list = NULL;
+	
+// 	if (overflow_node->string[0] && overflow_node)
+// 	{
+// 		*list = overflow_node;
+// 	}
+// 	else
+// 	{
+// 		free(buffer);
+// 		free(overflow_node);
+// 	}
+// }
+
+void	ft_trim_list(t_list **list, int read_fail)
 {
 	t_list	*tail;
 	t_list	*overflow_node;
 	int		i;
 	int		k;
-	char	*buffer;
+	char	*overflow_string;
 
 	if (*list == NULL)
 		return ;
-	buffer = malloc(BUFFER_SIZE + 1);
+	overflow_string = malloc(BUFFER_SIZE + 1);
+	// creates overflow_node to hold text after \n
 	overflow_node = malloc(sizeof(t_list));
-	if (buffer == NULL || overflow_node == NULL)
+	if (overflow_string == NULL || overflow_node == NULL)
 		return ;
 	tail = *list;
 	while (tail->next != NULL)
 		tail = tail->next;
 	i = 0;
 	k = 0;
+	// scans to end of previously printed line
 	while (tail->string[i] && tail->string[i] != '\n')
 		++i;
+	// captures char until \0
 	while (tail->string[i] && tail->string[++i])
-		buffer[k++] = tail->string[i];
-	buffer[k] = '\0';
-	overflow_node->string = buffer;
+		overflow_string[k++] = tail->string[i];
+	// terminates
+	overflow_string[k] = '\0';
+	// sets string field of overflow_node 
+	overflow_node->string = overflow_string;
 	overflow_node->next = NULL;
-	return (ft_dealloc_all(list, overflow_node, buffer));
+	return (ft_dealloc_all(list, overflow_node, overflow_string, read_fail));
 }
 
 /*	Continually checks if static list contains '\n' and builds list until it
@@ -297,13 +333,14 @@ int	ft_populate_list(t_list **list, int fd)
 		{
 			// ! deallocate properly
 			// ft_trim_list(list);
+			ft_deallocate_list(list);
 			free(buffer);
 			return (-1);
 			// return (free(buffer));
 		}
 		// if no bytes are read ie end of file
 		else if (bytes_read == 0)
-			return ((free(buffer)), -1);
+			return ((free(buffer)), 0);
 		// terminate the buffer string
 		buffer[bytes_read] = '\0';
 		// appends the new buffer string to the list
@@ -322,10 +359,11 @@ char	*get_next_line(int fd)
 	static t_list	*list = NULL;
 	int				next_line_length;
 	char			*next_line;
+	int				read_fail;
 
 	// if fd failed, buffer_size is 0 or less or read fails, return null
-	if (fd < 0 || BUFFER_SIZE <= 0)
-		return (NULL);
+	// if (/* fd < 0 || */ BUFFER_SIZE <= 0)
+	// 	return (NULL);
 	// ! if read fails on subsequent calls, memory is not being freed correctly
 	// if (read(fd, &next_line, 0) <= 0)
 	// {
@@ -334,7 +372,8 @@ char	*get_next_line(int fd)
 	// 	return (NULL);
 	// }
 	// send static list and fd to populate list
-	ft_populate_list(&list, fd);
+	read_fail = ft_populate_list(&list, fd);
+	// printf("%d rf\n", read_fail);
 		// return (NULL);
 	// if list not created, exit program
 	// ! is memory being freed correctly here?
@@ -350,7 +389,7 @@ char	*get_next_line(int fd)
 	// ! copy string can be sent next_line length
 	ft_copy_string(list, next_line);
 	// copy_str(list, next_line);
-	ft_trim_list(&list);
+	ft_trim_list(&list, read_fail);
 	return (next_line);
 }
 
