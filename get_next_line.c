@@ -6,7 +6,7 @@
 /*   By: timhopgood <timhopgood@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/24 20:04:39 by timhopgood        #+#    #+#             */
-/*   Updated: 2024/04/25 13:26:21 by timhopgood       ###   ########.fr       */
+/*   Updated: 2024/04/26 13:53:51 by timhopgood       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,44 +15,61 @@
 #define BOOL 0
 #define LENGTH 1
 
-// finds and returns last node in list
-
-t_list	*ft_lstlast(t_list *list)
+void	ft_deallocate_list(t_list **head)
 {
-	t_list	*node;
+	t_list	*curr;
+	t_list	*temp;
 
-	if (list == NULL)
-		return (NULL);
-	node = list;
-	while (node->next != NULL)
-		node = node->next;
-	return (node);
+	curr = NULL;
+	temp = NULL;
+	curr = *head;
+	while (curr)
+	{
+		temp = curr->next;
+		free(curr);
+		curr = temp;
+	}
+	*head = NULL;
 }
 
 // creates and appends new node with content 'content' to tail of list
 
-void	ft_list_append(t_list **list, void *content)
+void	ft_list_append(t_list **list, char *content)
 {
 	t_list	*new_node;
 	t_list	*tail;
 
+	// cursory check
 	if (list == NULL || content == NULL)
 		return ;
+	// ! creates new node ! MALLOC
 	new_node = malloc(sizeof(t_list));
 	if (new_node == NULL)
 		return ;
-	tail = ft_lstlast(*list);
-	if (tail == NULL)
-		*list = new_node;
-	else
-		tail->next = new_node;
+	// adds content to string field
 	new_node->string = content;
+	// sets next field to NULL
 	new_node->next = NULL;
+	// if list is empty, new node becomes list
+	if (*list == NULL)
+	{
+		*list = new_node;
+		return ;
+	}
+	// tail traverses list and new node is appended to end
+	tail = *list;
+	while (tail->next != NULL)
+		tail = tail->next;
+	tail->next = new_node;
+	return ;
 }
 
-// returns position + 1 of '\n' if found, else 0
+/*
+returns position + 1 of char 'c' if found, else, 0 if mode is BOOL (0),
+	if mode is LENGTH (1) total length of string
+*/
 
-int	ft_newline_position(t_list *list, int mode)
+int	ft_findnewline(t_list *list, char c, int mode)
 {
 	int	i;
 	int	length;
@@ -61,9 +78,9 @@ int	ft_newline_position(t_list *list, int mode)
 	while (list)
 	{
 		i = 0;
-		while (list->string[i] /* && i < BUFFER_SIZE */)
+		while (list->string[i])
 		{
-			if (list->string[i] == '\n')
+			if (list->string[i] == c)
 				return (++length);
 			++i;
 			++length;
@@ -73,48 +90,114 @@ int	ft_newline_position(t_list *list, int mode)
 	return (mode * length);
 }
 
-// builds string from list nodes
-
-char	*ft_get_line(t_list *list)
+size_t	ft_strlen(const char *s)
 {
-	int		str_len;
-	char	*next_str;
+	size_t	len;
 
-	if (list == NULL)
-		return (NULL);
-	str_len = ft_newline_position(list, LENGTH);
-	// printf("\n%d\n ll\n", str_len);
-	// str_len = ft_newline_position(list);
-	// printf("\n%d\n np\n", str_len);
-	next_str = malloc(str_len + 1);
-	if (NULL == next_str)
-		return (NULL);
-	copy_str(list, next_str);
-	return (next_str);
+	len = 0;
+	while (*s++)
+		len++;
+	return (len);
 }
 
-// gets line string from list nodes
-
-char	*ft_get_line_temp(t_list *list)
+size_t	ft_strlcpy(char *dest, const char *src, size_t dstsize)
 {
-	int		str_len;
-	char	*next_str;
+	const char	*src_ptr;
 
-	if (list == NULL)
-		return (NULL);
-	str_len = ft_newline_position(list, LENGTH);
-	next_str = malloc(str_len + 1);
-	if (NULL == next_str)
-		return (NULL);
-	copy_str(list, next_str);
-	return (next_str);
+	src_ptr = src;
+	if (dstsize > 0)
+	{
+		while (*src_ptr && dstsize-- > 1)
+			*dest++ = *src_ptr++;
+		*dest = '\0';
+	}
+	return (ft_strlen(src));
 }
 
-void	copy_str(t_list *list, char *str)
+// void	ft_copy_string(t_list *list, char *target_string, int target_size)
+// {
+// 	t_list	*current;
+// 	int		copied_size;
+
+// 	current = list;
+// 	copied_size = 0;
+// 	while (target_size > 0)
+// 	{
+// 		if (BUFFER_SIZE < target_size)
+// 		{
+// 			printf("%d<-target size\n", target_size);
+// 			printf("%s\n", target_string);
+
+// 			ft_strlcpy(target_string + copied_size, current->string, BUFFER_SIZE + 1);
+// 			target_size -= BUFFER_SIZE;
+// 			copied_size += BUFFER_SIZE;
+// 			current = current->next;
+// 		}
+// 		else
+// 		{
+// 			ft_strlcpy(target_string + copied_size, current->string, target_size + 1);
+// 			printf("%s\n", target_string);
+// 			printf("breaking\n");
+// 			break ;
+// 		}
+// 	}
+// }
+
+// void	ft_copy_string(t_list *list, char *target_string, int target_size)
+// {
+// 	t_list	*current;
+// 	int		copied_size;
+// 	int		current_length;
+// 	int		to_copy;
+
+// 	current = list;
+// 	// tracks total chars already copied
+// 	copied_size = 0;
+// 	// while list and still char left to copy
+// 	printf("%d<-target size\n", target_size);
+// 	while (current && copied_size < target_size)
+// 	{
+// 		current_length = ft_strlen(current->string);
+// 		if (copied_size + current_length <= target_size)
+// 			to_copy = current_length;
+// 		else
+// 			to_copy = target_size - copied_size;
+// 		ft_strlcpy(target_string + copied_size, current->string, to_copy + 1);
+// 		copied_size += to_copy;
+// 		current = current->next;
+// 	}
+// }
+
+// void copyStringsToTarget(Node *head, char *target, size_t targetSize) {
+//     Node *current = head;
+//     size_t copiedSize = 0;
+
+//     // Iterate through the linked list nodes
+//     while (current != NULL && copiedSize < targetSize) {
+//         size_t len = strlen(current->data);
+
+//         // Determine how many characters to copy
+//         size_t toCopy;
+//         if (copiedSize + len <= targetSize) {
+//             toCopy = len;
+//         } else {
+//             toCopy = targetSize - copiedSize;
+//         }
+
+//        
+	// Copy characters from the current node's string to the target string
+//         strncpy(target + copiedSize, current->data, toCopy);
+
+//         copiedSize += toCopy;
+//         current = current->next;
+//     }
+
+void	ft_copy_string(t_list *list, char *string)
 {
 	int	i;
 	int	k;
 
+	// cursory check
 	if (list == NULL)
 		return ;
 	k = 0;
@@ -125,44 +208,18 @@ void	copy_str(t_list *list, char *str)
 		{
 			if (list->string[i] == '\n')
 			{
-				str[k++] = '\n';
-				str[k] = '\0';
+				string[k++] = '\n';
+				string[k] = '\0';
 				return ;
 			}
-			str[k++] = list->string[i++];
+			string[k++] = list->string[i++];
 		}
 		list = list->next;
 	}
-	str[k] = '\0';
+	string[k] = '\0';
 }
 
-void	copy_str_temp(t_list *list, char *str)
-{
-	int	i;
-	int	k;
-
-	if (list == NULL)
-		return ;
-	k = 0;
-	while (list)
-	{
-		i = 0;
-		while (list->string[i])
-		{
-			if (list->string[i] == '\n')
-			{
-				str[k++] = '\n';
-				str[k] = '\0';
-				return ;
-			}
-			str[k++] = list->string[i++];
-		}
-		list = list->next;
-	}
-	str[k] = '\0';
-}
-
-void	ft_deallocate_all(t_list **list, t_list *clean_node, char *buf)
+void	ft_dealloc_all(t_list **list, t_list *overflow_node, char *buffer)
 {
 	t_list	*temp_node;
 
@@ -176,102 +233,130 @@ void	ft_deallocate_all(t_list **list, t_list *clean_node, char *buf)
 		*list = temp_node;
 	}
 	*list = NULL;
-	if (clean_node->string[0])
-		*list = clean_node;
+	if (overflow_node->string[0] && overflow_node)
+	{
+		*list = overflow_node;
+	}
 	else
 	{
-		free(buf);
-		free(clean_node);
+		free(buffer);
+		free(overflow_node);
 	}
 }
 
 void	ft_trim_list(t_list **list)
 {
-	t_list	*last_node;
-	t_list	*clean_node;
+	t_list	*tail;
+	t_list	*overflow_node;
 	int		i;
 	int		k;
-	char	*buf;
+	char	*buffer;
 
-	buf = malloc(BUFFER_SIZE + 1);
-	clean_node = malloc(sizeof(t_list));
-	if (NULL == buf || NULL == clean_node)
+	if (*list == NULL)
 		return ;
-	last_node = ft_lstlast(*list);
+	buffer = malloc(BUFFER_SIZE + 1);
+	overflow_node = malloc(sizeof(t_list));
+	if (buffer == NULL || overflow_node == NULL)
+		return ;
+	tail = *list;
+	while (tail->next != NULL)
+		tail = tail->next;
 	i = 0;
 	k = 0;
-	while (last_node->string[i] && last_node->string[i] != '\n')
+	while (tail->string[i] && tail->string[i] != '\n')
 		++i;
-	while (last_node->string[i] && last_node->string[++i])
-		buf[k++] = last_node->string[i];
-	buf[k] = '\0';
-	clean_node->string = buf;
-	clean_node->next = NULL;
-	ft_deallocate_all(list, clean_node, buf);
+	while (tail->string[i] && tail->string[++i])
+		buffer[k++] = tail->string[i];
+	buffer[k] = '\0';
+	overflow_node->string = buffer;
+	overflow_node->next = NULL;
+	return (ft_dealloc_all(list, overflow_node, buffer));
 }
 
-// determines the length of the string until newline character is encountered
+/*	Continually checks if static list contains '\n' and builds list until it
+ *	does.
+ */
 
-// int	ft_line_length(t_list *list)
-// {
-// 	int	i;
-// 	int	length;
-
-// 	if (list == NULL)
-// 		return (0);
-// 	length = 0;
-// 	while (list)
-// 	{
-// 		i = 0;
-// 		while (list->string[i] /* && i < BUFFER_SIZE */)
-// 		{
-// 			if (list->string[i] == '\n')
-// 				return (++length);
-// 			++i;
-// 			++length;
-// 		}
-// 		list = list->next;
-// 	}
-// 	return (length);
-// }
-
-void	ft_populate_list(t_list **list, int fd)
+int	ft_populate_list(t_list **list, int fd)
 {
 	int		bytes_read;
 	char	*buffer;
 
-	while (ft_newline_position(*list, BOOL) == 0)
+	// loops through list to check for \n and continues while it is not found
+	while (ft_findnewline(*list, '\n', BOOL) == 0)
 	{
+		// allocates buffer + 1 (for \0) size chunk of memory
 		buffer = malloc(sizeof(char) * BUFFER_SIZE + 1);
 		if (buffer == NULL)
-			return ;
+			// if it returns, does the function properly handle that
+			return (-1);
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
-		if (bytes_read == 0)
-			return (free(buffer));
+		// if read fails
+		// ! deal with a failure on the > 1st call
+		if (bytes_read == -1)
+		{
+			// ! deallocate properly
+			// ft_trim_list(list);
+			free(buffer);
+			return (-1);
+			// return (free(buffer));
+		}
+		// if no bytes are read ie end of file
+		else if (bytes_read == 0)
+			return ((free(buffer)), -1);
+		// terminate the buffer string
 		buffer[bytes_read] = '\0';
+		// appends the new buffer string to the list
 		ft_list_append(list, buffer);
 	}
+	return (0);
 }
+
+/*
+ *
+ *
+ */
 
 char	*get_next_line(int fd)
 {
 	static t_list	*list = NULL;
+	int				next_line_length;
 	char			*next_line;
 
+	// if fd failed, buffer_size is 0 or less or read fails, return null
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	if (read(fd, &next_line, 0) < 0)
-		return (ft_deallocate_all(&list, NULL, NULL), NULL);
+	// ! if read fails on subsequent calls, memory is not being freed correctly
+	// if (read(fd, &next_line, 0) <= 0)
+	// {
+	// 	// if (list != NULL)
+	// 	// 	ft_dealloc_all(&list, NULL, NULL);
+	// 	return (NULL);
+	// }
+	// send static list and fd to populate list
 	ft_populate_list(&list, fd);
+		// return (NULL);
+	// if list not created, exit program
+	// ! is memory being freed correctly here?
 	if (list == NULL)
 		return (NULL);
-	next_line = ft_get_line(list);
+	// this part calculates the length of the string to (malloc and) returns
+	next_line_length = ft_findnewline(list, '\n', LENGTH);
+	next_line = malloc(next_line_length + 1);
+	if (next_line == NULL)
+		// ! also free here?
+		return (NULL);
+	// sends list and malloc'd next_line to copy the string from the list
+	// ! copy string can be sent next_line length
+	ft_copy_string(list, next_line);
+	// copy_str(list, next_line);
 	ft_trim_list(&list);
 	return (next_line);
 }
 
 // ! segfault in deallocate
 // ! could deallocate list and buffer separately
+// ! is returning -1 from functions necessary? Check
 
 /* int	main(void)
 {
@@ -287,3 +372,35 @@ char	*get_next_line(int fd)
 } */
 
 // fd = open("test.txt", O_RDWR | O_CREAT);
+
+// #include <stdio.h>
+// #include <fcntl.h>
+
+// int	main(void)
+// {
+// 	int fd;
+// 	char *next_line;
+// 	int count;
+
+//     count = 0;
+//     fd = open("test.txt", O_RDONLY);
+//     next_line = get_next_line(fd);
+//     count ++;
+// 	while ()
+//     printf("[%d]: %s\n", count, next_line);
+//     close(fd);
+// 	return (0);
+// }
+
+// int main()
+// {
+// 	int fd;
+// 	char *line;
+// 	int lines;
+
+// 	lines = 1;
+// 	fd = open("test.txt", O_RDONLY);
+
+// 	while ((line = get_next_line(fd)))
+// 		printf("%d->%s\n", lines++, line);
+// }
