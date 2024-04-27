@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   .get_next_line_tempMOK.c                           :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: timhopgood <timhopgood@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/24 20:04:39 by timhopgood        #+#    #+#             */
-/*   Updated: 2024/04/27 01:01:04 by timhopgood       ###   ########.fr       */
+/*   Updated: 2024/04/27 20:02:22 by timhopgood       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 #define BOOL 0
 #define LENGTH 1
@@ -19,28 +19,38 @@
  * Creates and appends new node with content 'content' to tail of list.
  */
 
-int	ft_list_append(t_list **list, char *content)
+static int	ft_list_append(t_list **list, char *content, int fd)
 {
 	t_list	*new_node;
 	t_list	*tail;
 
 	new_node = malloc(sizeof(t_list));
 	if (new_node == NULL)
-		return (ft_dealloc_list(list), -1);
+		return (ft_dealloc_list(&list[fd]), -1);
 	new_node->string = content;
 	new_node->next = NULL;
-	if (*list == NULL)
+	if (list[fd] == NULL)
 	{
-		*list = new_node;
-		return 0;
+		list[fd] = new_node;
+		return (0);
 	}
-	tail = ft_lstlast(*list);
+	tail = ft_lstlast(list[fd]);
 	tail->next = new_node;
-	return 0;
+	return (0);
 }
 
-void	ft_process_oflow(t_list **list, t_list *oflow_node, char *oflow_string)
+/*
+ *	sets oflow node's string field to oflow string. deallocates list.
+ *	sets static list head to oflow node if oflow string exists,
+ *	otherwise frees.
+ */
+
+static void	ft_process_oflow(t_list **list, t_list *oflow_node,
+		char *oflow_string)
 {
+	oflow_node->string = oflow_string;
+	oflow_node->next = NULL;
+	ft_dealloc_list(list);
 	if (oflow_node->string[0] && oflow_node)
 		*list = oflow_node;
 	else
@@ -55,12 +65,20 @@ void	ft_process_oflow(t_list **list, t_list *oflow_node, char *oflow_string)
  *	after \n from last node.
  */
 
-void	ft_build_oflow(t_list **list, t_list *oflow_node, char *oflow_string)
+static int	ft_build_oflow(t_list **list)
 {
 	t_list	*tail;
+	t_list	*oflow_node;
+	char	*oflow_string;
 	int		i;
 	int		k;
 
+	oflow_string = malloc(BUFFER_SIZE + 1);
+	if (oflow_string == NULL)
+		return (-1);
+	oflow_node = malloc(sizeof(t_list));
+	if (oflow_node == NULL)
+		return (free(oflow_string), -1);
 	tail = ft_lstlast(*list);
 	i = 0;
 	k = 0;
@@ -69,8 +87,8 @@ void	ft_build_oflow(t_list **list, t_list *oflow_node, char *oflow_string)
 	while (tail->string[i] && tail->string[++i])
 		oflow_string[k++] = tail->string[i];
 	oflow_string[k] = '\0';
-	oflow_node->string = oflow_string;
-	oflow_node->next = NULL;
+	ft_process_oflow(list, oflow_node, oflow_string);
+	return (0);
 }
 
 /*
@@ -78,69 +96,58 @@ void	ft_build_oflow(t_list **list, t_list *oflow_node, char *oflow_string)
  *		does. Appending each buffer to a new node in the linked list.
  */
 
-void	ft_populate_list(t_list **list, int fd)
+static void	ft_populate_list(t_list **list, int fd)
 {
 	int		bytes_read;
 	char	*buffer;
 
-	while (ft_findnewline(*list, '\n', BOOL) == 0)
+	while (ft_findnewline(list[fd], '\n', BOOL) == 0)
 	{
 		buffer = malloc(sizeof(char) * BUFFER_SIZE + 1);
 		if (buffer == NULL)
-			return ft_dealloc_list(list);
+			return (ft_dealloc_list(&list[fd]));
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
 		if (bytes_read < 0)
 		{
-			ft_dealloc_list(list);
+			ft_dealloc_list(&list[fd]);
 			return (free(buffer));
 		}
 		else if (bytes_read == 0)
 			return (free(buffer));
 		buffer[bytes_read] = '\0';
-		if (ft_list_append(list, buffer) == -1)
-				return free(buffer);
+		if (ft_list_append(list, buffer, fd) == -1)
+			return (free(buffer));
 	}
 }
 
 /*
  *	Builds linked list with buffer obtained from fd.
  *	Determines length of line (until \n) and mallocates memory for it.
+ *	Returns new line.
  *	Cleans list in preparation for next call.
  */
 
 char	*get_next_line(int fd)
 {
-	static t_list	*list = NULL;
+	static t_list	*list[4096];
 	int				next_line_length;
 	char			*next_line;
-	t_list			*oflow_node;
-	char			*oflow_string;
 
-	ft_populate_list(&list, fd);
-	if (list == NULL)
+	if (fd < 0 || 4095 < fd)
 		return (NULL);
-	next_line_length = ft_findnewline(list, '\n', LENGTH);
+	ft_populate_list(list, fd);
+	if (list[fd] == NULL)
+		return (NULL);
+	next_line_length = ft_findnewline(list[fd], '\n', LENGTH);
 	next_line = malloc(next_line_length + 1);
 	if (next_line == NULL)
-		return (ft_dealloc_list(&list), NULL);
-	ft_copy_string(list, next_line);
-	oflow_string = malloc(BUFFER_SIZE + 1);
-	if (oflow_string == NULL)
+		return (ft_dealloc_list(&list[fd]), NULL);
+	ft_copy_string(list[fd], next_line);
+	if (ft_build_oflow(&list[fd]) == -1)
 	{
-		ft_dealloc_list(&list);
-		free(next_line);
-		return (NULL);
+		ft_dealloc_list(&list[fd]);
+		return (free(next_line), NULL);
 	}
-	oflow_node = malloc(sizeof(t_list));
-	if (oflow_node == NULL)
-	{
-		ft_dealloc_list(&list);
-		free(next_line);
-		return (free(oflow_string), NULL);
-	}
-	ft_build_oflow(&list, oflow_node, oflow_string);
-	ft_dealloc_list(&list);
-	ft_process_oflow(&list, oflow_node, oflow_string);
 	return (next_line);
 }
 
@@ -190,6 +197,7 @@ char	*get_next_line(int fd)
 
 // 	lines = 1;
 // 	fd = open("test.txt", O_RDONLY);
+// 	printf("%d fd\n", fd);
 
 // 	line = get_next_line(fd);
 // 	printf("%d->%s\n", lines++, line);
@@ -199,8 +207,8 @@ char	*get_next_line(int fd)
 // 	printf("%d->%s\n", lines++, line);
 // 	line = get_next_line(fd);
 // 	printf("%d->%s\n", lines++, line);
-// 	line = get_next_line(fd);
-// 	printf("%d->%s\n", lines++, line);
+// 	// line = get_next_line(fd);
+// 	// printf("%d->%s\n", lines++, line);
 // 	// line = get_next_line(-1);
 // 	// printf("%d->%s\n", lines++, line);
 // }

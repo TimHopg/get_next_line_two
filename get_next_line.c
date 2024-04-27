@@ -6,7 +6,7 @@
 /*   By: timhopgood <timhopgood@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/24 20:04:39 by timhopgood        #+#    #+#             */
-/*   Updated: 2024/04/27 01:34:42 by timhopgood       ###   ########.fr       */
+/*   Updated: 2024/04/27 20:03:01 by timhopgood       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
  * Creates and appends new node with content 'content' to tail of list.
  */
 
-int	ft_list_append(t_list **list, char *content)
+static int	ft_list_append(t_list **list, char *content)
 {
 	t_list	*new_node;
 	t_list	*tail;
@@ -39,7 +39,14 @@ int	ft_list_append(t_list **list, char *content)
 	return (0);
 }
 
-void	ft_process_oflow(t_list **list, t_list *oflow_node, char *oflow_string)
+/*
+ *	sets oflow node's string field to oflow string. deallocates list.
+ *	sets static list head to oflow node if oflow string exists,
+ *	otherwise frees.
+ */
+
+static void	ft_process_oflow(t_list **list, t_list *oflow_node,
+		char *oflow_string)
 {
 	oflow_node->string = oflow_string;
 	oflow_node->next = NULL;
@@ -58,7 +65,7 @@ void	ft_process_oflow(t_list **list, t_list *oflow_node, char *oflow_string)
  *	after \n from last node.
  */
 
-int	ft_build_oflow(t_list **list)
+static int	ft_build_oflow(t_list **list)
 {
 	t_list	*tail;
 	t_list	*oflow_node;
@@ -89,7 +96,7 @@ int	ft_build_oflow(t_list **list)
  *		does. Appending each buffer to a new node in the linked list.
  */
 
-void	ft_populate_list(t_list **list, int fd)
+static void	ft_populate_list(t_list **list, int fd)
 {
 	int		bytes_read;
 	char	*buffer;
@@ -116,6 +123,7 @@ void	ft_populate_list(t_list **list, int fd)
 /*
  *	Builds linked list with buffer obtained from fd.
  *	Determines length of line (until \n) and mallocates memory for it.
+ *	Returns new line.
  *	Cleans list in preparation for next call.
  */
 
