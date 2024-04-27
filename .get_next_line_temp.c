@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   .get_next_line_temp.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: timhopgood <timhopgood@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/24 20:04:39 by timhopgood        #+#    #+#             */
-/*   Updated: 2024/04/27 01:34:42 by timhopgood       ###   ########.fr       */
+/*   Updated: 2024/04/26 23:18:31 by timhopgood       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,34 +16,125 @@
 #define LENGTH 1
 
 /*
+ * Traverses to tail of list and returns.
+ */
+
+t_list	*ft_lstlast(t_list *lst)
+{
+	t_list	*node;
+
+	if (lst == NULL)
+		return (NULL);
+	node = lst;
+	while (node->next != NULL)
+		node = node->next;
+	return (node);
+}
+
+/*
  * Creates and appends new node with content 'content' to tail of list.
  */
 
-int	ft_list_append(t_list **list, char *content)
+void	ft_list_append(t_list **list, char *content)
 {
 	t_list	*new_node;
 	t_list	*tail;
 
 	new_node = malloc(sizeof(t_list));
 	if (new_node == NULL)
-		return (ft_dealloc_list(list), -1);
+		return ;
 	new_node->string = content;
 	new_node->next = NULL;
 	if (*list == NULL)
 	{
 		*list = new_node;
-		return (0);
+		return ;
 	}
 	tail = ft_lstlast(*list);
 	tail->next = new_node;
-	return (0);
+	return ;
+}
+
+/*
+ *	Returns position + 1 of char 'c' if found, else, 0 if mode is BOOL (0),
+ *		if mode is LENGTH (1) total length of string
+ */
+
+int	ft_findnewline(t_list *list, char c, int mode)
+{
+	int	i;
+	int	length;
+
+	length = 0;
+	while (list)
+	{
+		i = 0;
+		while (list->string[i])
+		{
+			if (list->string[i] == c)
+				return (++length);
+			++i;
+			++length;
+		}
+		list = list->next;
+	}
+	return (mode * length);
+}
+
+/*
+ *	Copies string from linked list up to and including \n then terminates
+ */
+
+void	ft_copy_string(t_list *list, char *string)
+{
+	int	i;
+	int	k;
+
+	if (list == NULL)
+		return ;
+	k = 0;
+	while (list)
+	{
+		i = 0;
+		while (list->string[i])
+		{
+			if (list->string[i] == '\n')
+			{
+				string[k++] = '\n';
+				string[k] = '\0';
+				return ;
+			}
+			string[k++] = list->string[i++];
+		}
+		list = list->next;
+	}
+	string[k] = '\0';
+}
+
+/*
+ *	Deallocates list and if overflow node/string exist, deallocates them.
+ *	If called after a 'read_fail', skips overflow step.
+ */
+
+void	ft_dealloc_list(t_list **list)
+{
+	t_list	*temp_node;
+	t_list	*curr_node;
+
+	curr_node = *list;
+	temp_node = NULL;
+	while (curr_node)
+	{
+		temp_node = curr_node->next;
+		free(curr_node->string);
+		free(curr_node);
+		curr_node = temp_node;
+	}
+	*list = NULL;
 }
 
 void	ft_process_oflow(t_list **list, t_list *oflow_node, char *oflow_string)
 {
-	oflow_node->string = oflow_string;
-	oflow_node->next = NULL;
-	ft_dealloc_list(list);
 	if (oflow_node->string[0] && oflow_node)
 		*list = oflow_node;
 	else
@@ -58,20 +149,12 @@ void	ft_process_oflow(t_list **list, t_list *oflow_node, char *oflow_string)
  *	after \n from last node.
  */
 
-int	ft_build_oflow(t_list **list)
+void	ft_build_oflow(t_list **list, t_list *oflow_node, char *oflow_string)
 {
 	t_list	*tail;
-	t_list	*oflow_node;
-	char	*oflow_string;
 	int		i;
 	int		k;
 
-	oflow_string = malloc(BUFFER_SIZE + 1);
-	if (oflow_string == NULL)
-		return (-1);
-	oflow_node = malloc(sizeof(t_list));
-	if (oflow_node == NULL)
-		return (free(oflow_string), -1);
 	tail = ft_lstlast(*list);
 	i = 0;
 	k = 0;
@@ -80,8 +163,8 @@ int	ft_build_oflow(t_list **list)
 	while (tail->string[i] && tail->string[++i])
 		oflow_string[k++] = tail->string[i];
 	oflow_string[k] = '\0';
-	ft_process_oflow(list, oflow_node, oflow_string);
-	return (0);
+	oflow_node->string = oflow_string;
+	oflow_node->next = NULL;
 }
 
 /*
@@ -98,7 +181,7 @@ void	ft_populate_list(t_list **list, int fd)
 	{
 		buffer = malloc(sizeof(char) * BUFFER_SIZE + 1);
 		if (buffer == NULL)
-			return (ft_dealloc_list(list));
+			return ;
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
 		if (bytes_read < 0)
 		{
@@ -108,8 +191,7 @@ void	ft_populate_list(t_list **list, int fd)
 		else if (bytes_read == 0)
 			return (free(buffer));
 		buffer[bytes_read] = '\0';
-		if (ft_list_append(list, buffer) == -1)
-			return (free(buffer));
+		ft_list_append(list, buffer);
 	}
 }
 
@@ -124,6 +206,8 @@ char	*get_next_line(int fd)
 	static t_list	*list = NULL;
 	int				next_line_length;
 	char			*next_line;
+	t_list			*oflow_node;
+	char			*oflow_string;
 
 	ft_populate_list(&list, fd);
 	if (list == NULL)
@@ -131,13 +215,15 @@ char	*get_next_line(int fd)
 	next_line_length = ft_findnewline(list, '\n', LENGTH);
 	next_line = malloc(next_line_length + 1);
 	if (next_line == NULL)
-		return (ft_dealloc_list(&list), NULL);
+		return (NULL);
 	ft_copy_string(list, next_line);
-	if (ft_build_oflow(&list) == -1)
-	{
-		ft_dealloc_list(&list);
-		return (free(next_line), NULL);
-	}
+	oflow_string = malloc(BUFFER_SIZE + 1);
+	oflow_node = malloc(sizeof(t_list));
+	if (oflow_string == NULL || oflow_node == NULL)
+		return (NULL);
+	ft_build_oflow(&list, oflow_node, oflow_string);
+	ft_dealloc_list(&list);
+	ft_process_oflow(&list, oflow_node, oflow_string);
 	return (next_line);
 }
 

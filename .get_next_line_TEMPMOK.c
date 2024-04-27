@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   .get_next_line_tempMOK.c                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: timhopgood <timhopgood@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/24 20:04:39 by timhopgood        #+#    #+#             */
-/*   Updated: 2024/04/27 01:34:42 by timhopgood       ###   ########.fr       */
+/*   Updated: 2024/04/27 01:01:04 by timhopgood       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,18 +32,15 @@ int	ft_list_append(t_list **list, char *content)
 	if (*list == NULL)
 	{
 		*list = new_node;
-		return (0);
+		return 0;
 	}
 	tail = ft_lstlast(*list);
 	tail->next = new_node;
-	return (0);
+	return 0;
 }
 
 void	ft_process_oflow(t_list **list, t_list *oflow_node, char *oflow_string)
 {
-	oflow_node->string = oflow_string;
-	oflow_node->next = NULL;
-	ft_dealloc_list(list);
 	if (oflow_node->string[0] && oflow_node)
 		*list = oflow_node;
 	else
@@ -58,20 +55,12 @@ void	ft_process_oflow(t_list **list, t_list *oflow_node, char *oflow_string)
  *	after \n from last node.
  */
 
-int	ft_build_oflow(t_list **list)
+void	ft_build_oflow(t_list **list, t_list *oflow_node, char *oflow_string)
 {
 	t_list	*tail;
-	t_list	*oflow_node;
-	char	*oflow_string;
 	int		i;
 	int		k;
 
-	oflow_string = malloc(BUFFER_SIZE + 1);
-	if (oflow_string == NULL)
-		return (-1);
-	oflow_node = malloc(sizeof(t_list));
-	if (oflow_node == NULL)
-		return (free(oflow_string), -1);
 	tail = ft_lstlast(*list);
 	i = 0;
 	k = 0;
@@ -80,8 +69,8 @@ int	ft_build_oflow(t_list **list)
 	while (tail->string[i] && tail->string[++i])
 		oflow_string[k++] = tail->string[i];
 	oflow_string[k] = '\0';
-	ft_process_oflow(list, oflow_node, oflow_string);
-	return (0);
+	oflow_node->string = oflow_string;
+	oflow_node->next = NULL;
 }
 
 /*
@@ -98,7 +87,7 @@ void	ft_populate_list(t_list **list, int fd)
 	{
 		buffer = malloc(sizeof(char) * BUFFER_SIZE + 1);
 		if (buffer == NULL)
-			return (ft_dealloc_list(list));
+			return ft_dealloc_list(list);
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
 		if (bytes_read < 0)
 		{
@@ -109,7 +98,7 @@ void	ft_populate_list(t_list **list, int fd)
 			return (free(buffer));
 		buffer[bytes_read] = '\0';
 		if (ft_list_append(list, buffer) == -1)
-			return (free(buffer));
+				return free(buffer);
 	}
 }
 
@@ -124,6 +113,8 @@ char	*get_next_line(int fd)
 	static t_list	*list = NULL;
 	int				next_line_length;
 	char			*next_line;
+	t_list			*oflow_node;
+	char			*oflow_string;
 
 	ft_populate_list(&list, fd);
 	if (list == NULL)
@@ -133,11 +124,23 @@ char	*get_next_line(int fd)
 	if (next_line == NULL)
 		return (ft_dealloc_list(&list), NULL);
 	ft_copy_string(list, next_line);
-	if (ft_build_oflow(&list) == -1)
+	oflow_string = malloc(BUFFER_SIZE + 1);
+	if (oflow_string == NULL)
 	{
 		ft_dealloc_list(&list);
-		return (free(next_line), NULL);
+		free(next_line);
+		return (NULL);
 	}
+	oflow_node = malloc(sizeof(t_list));
+	if (oflow_node == NULL)
+	{
+		ft_dealloc_list(&list);
+		free(next_line);
+		return (free(oflow_string), NULL);
+	}
+	ft_build_oflow(&list, oflow_node, oflow_string);
+	ft_dealloc_list(&list);
+	ft_process_oflow(&list, oflow_node, oflow_string);
 	return (next_line);
 }
 

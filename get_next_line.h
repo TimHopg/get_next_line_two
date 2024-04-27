@@ -6,7 +6,7 @@
 /*   By: timhopgood <timhopgood@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/24 20:04:31 by timhopgood        #+#    #+#             */
-/*   Updated: 2024/04/26 10:08:05 by timhopgood       ###   ########.fr       */
+/*   Updated: 2024/04/26 23:17:46 by timhopgood       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,9 @@ typedef struct s_list
 }					t_list;
 
 char				*get_next_line(int fd);
-// t_list				*find_last_node(t_list *list);
-// int					is_newline(t_list *list);
-// void				copy_str(t_list *list, char *str);
-// char				*grab_line(t_list *list);
-// void				append(t_list **list, char *buffer);
-// void				dealloc(t_list **list, t_list *clean_node, char *buf);
-// void				clean_list(t_list **list);
-// int	ft_line_length(t_list *list);
-// void				create_list(t_list **list, int fd);
+t_list				*ft_lstlast(t_list *lst);
+void				ft_dealloc_list(t_list **list);
+int					ft_findnewline(t_list *list, char c, int mode);
+void				ft_copy_string(t_list *list, char *string);
 
 #endif
