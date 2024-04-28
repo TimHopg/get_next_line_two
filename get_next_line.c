@@ -6,7 +6,7 @@
 /*   By: timhopgood <timhopgood@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/24 20:04:39 by timhopgood        #+#    #+#             */
-/*   Updated: 2024/04/27 20:03:01 by timhopgood       ###   ########.fr       */
+/*   Updated: 2024/04/28 01:55:50 by timhopgood       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,22 +149,27 @@ char	*get_next_line(int fd)
 	return (next_line);
 }
 
-// ! segfault in deallocate
-// ! could deallocate list and buffer separately
-// ! is returning -1 from functions necessary? Check
-
-/* int	main(void)
+int	main(void)
 {
 	int		fd;
-	char	*buffer;
+	char	*line;
 	int		lines_read;
 
 	lines_read = 1;
+	fd = open("test.txt", O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+	write(fd, "AAAAAAAAAA\n", 11);
+	write(fd, "BBBBBBBBBB\n", 11);
+	write(fd, "CCCCCCCCCC\n", 11);
+	write(fd, "DDDDDDDDDD", 10);
+	close(fd);
+	
 	fd = open("test.txt", O_RDONLY);
-	while ((buffer = get_next_line(fd)))
-		printf("%d->%s\n", lines_read++, buffer);
+	while ((line = get_next_line(fd)))
+		printf("%d->%s\n", lines_read++, line);
+    close(fd);
+	
 	return (0);
-} */
+}
 
 // fd = open("test.txt", O_RDWR | O_CREAT);
 
