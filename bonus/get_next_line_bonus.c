@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: timhopgood <timhopgood@student.42.fr>      +#+  +:+       +#+        */
+/*   By: thopgood <thopgood@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/24 20:04:39 by timhopgood        #+#    #+#             */
-/*   Updated: 2024/04/27 20:02:22 by timhopgood       ###   ########.fr       */
+/*   Updated: 2024/04/28 14:32:18 by thopgood         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,64 +151,185 @@ char	*get_next_line(int fd)
 	return (next_line);
 }
 
-// ! segfault in deallocate
-// ! could deallocate list and buffer separately
-// ! is returning -1 from functions necessary? Check
+// # include <fcntl.h> // open/write
+// # include <sys/stat.h> // USR permissions
+// # include <stdio.h> // printf
 
-/* int	main(void)
-{
-	int		fd;
-	char	*buffer;
-	int		lines_read;
+// /* standard input main */
+// int main(void)
+// {
+//     char *line;
+//     int fd = 0; // std input
 
-	lines_read = 1;
-	fd = open("test.txt", O_RDONLY);
-	while ((buffer = get_next_line(fd)))
-		printf("%d->%s\n", lines_read++, buffer);
-	return (0);
-} */
+// 	//ctrl + d == end of file
+//     printf("Enter text (press Ctrl+D to exit):\n"); 
 
-// fd = open("test.txt", O_RDWR | O_CREAT);
+//     /* Read lines until EOF (Ctrl+D is pressed) */
+//     while ((line = get_next_line(fd)))
+//     {
+//         printf("Next line: %s\n", line);
+//         free(line); // Free allocated memory for the line
+//     }
 
-// #include <stdio.h>
-// #include <fcntl.h>
+//     printf("End of input reached. Exiting...\n");
+
+//     return 0;
+// }
 
 // int	main(void)
 // {
-// 	int fd;
-// 	char *next_line;
-// 	int count;
+// 	int		fd;
+// 	char	*line;
+// 	int		lines_read;
 
-//     count = 0;
-//     fd = open("test.txt", O_RDONLY);
-//     next_line = get_next_line(fd);
-//     count ++;
-// 	while ()
-//     printf("[%d]: %s\n", count, next_line);
+// 	fd = 42;
+// 	printf("NON-READABLE FD VALUE\n");
+// 	printf("fd = %d: Should return (null)\n", fd);
+// 	printf("RETURNS: %s\n\n", get_next_line(fd));
+
+// 	fd = open("standard_test.txt", O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+// 	write(fd, "AAAAAAAAAA\n", 11);
+// 	write(fd, "BBBBBBBBBB\n", 11);
+// 	write(fd, "CCCCCCCCCC\n", 11);
+// 	write(fd, "DDDDDDDDDD", 10);
+// 	close(fd);
+
+// 	printf("STANDARD TEST\n");
+// 	lines_read = 1;
+// 	fd = open("standard_test.txt", O_RDONLY);
+// 	while ((line = get_next_line(fd)))
+// 		printf("[Line %d]%s⤶", lines_read++, line);
 //     close(fd);
+// 	printf("\n\n");
+
+// 	printf("READ FAIL 1ST ITERATION\n");
+// 	lines_read = 1;
+// 	fd = -1;
+// 	line = get_next_line(fd);
+// 	printf("[Line %d]%s⤶", lines_read++, line);
+// 	printf("\n\n");
+
+// 	printf("READ FAIL 3RD ITERATION\n");
+// 	lines_read = 1;
+// 	fd = open("standard_test.txt", O_RDONLY);
+// 	line = get_next_line(fd);
+// 	printf("[Line %d]%s⤶", lines_read++, line);
+// 	line = get_next_line(fd);
+// 	printf("[Line %d]%s⤶", lines_read++, line);
+// 	line = get_next_line(-1);
+// 	printf("[Line %d]%s⤶", lines_read++, line);
+// 	close(fd);
+// 	printf("\n\n");
+
+// 	printf("SINGLE LONG LINE\n");
+// 	fd = open("single_longline.txt", O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+// 	int l = 0;
+// 	while (l++ < 2500)
+// 		write(fd, "A", 1);
+// 	close(fd);
+
+// 	fd = open("single_longline.txt", O_RDONLY);
+// 	lines_read = 1;
+// 	while ((line = get_next_line(fd)))
+// 		printf("[Line %d]%s⤶", lines_read++, line);
+//     close(fd);
+// 	printf("\n\n");
+
+// 	printf("MULTIPLE LONG LINE\n");
+// 	fd = open("multi_longline.txt", O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+// 	l = 0;
+// 	while (l++ < 2500)
+// 		write(fd, "A", 1);
+// 	write(fd, "\n", 1);
+// 	l = 0;
+// 	while (l++ < 2500)
+// 		write(fd, "B", 1);
+// 	write(fd, "\n", 1);
+// 	l = 0;
+// 	while (l++ < 2500)
+// 		write(fd, "C", 1);
+// 	close(fd);
+
+// 	fd = open("multi_longline.txt", O_RDONLY);
+// 	lines_read = 1;
+// 	while ((line = get_next_line(fd)))
+// 		printf("[Line %d]%s⤶", lines_read++, line);
+//     close(fd);
+// 	printf("\n\n");
+
+// 	printf("SINGLE SHORT LINE\n");
+// 	fd = open("single_shortline.txt", O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+// 	write(fd, "Z", 1);
+// 	close(fd);
+
+// 	fd = open("single_shortline.txt", O_RDONLY);
+// 	lines_read = 1;
+// 	while ((line = get_next_line(fd)))
+// 		printf("[Line %d]%s⤶", lines_read++, line);
+//     close(fd);
+// 	printf("\n\n");
+
+// 	printf("MULTI SHORT LINE\n");
+// 	fd = open("multi_shortline.txt", O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+// 	write(fd, "W\n", 2);
+// 	write(fd, "X\n", 2);
+// 	write(fd, "Y\n", 2);
+// 	write(fd, "Z", 1);
+// 	close(fd);
+
+// 	fd = open("multi_shortline.txt", O_RDONLY);
+// 	lines_read = 1;
+// 	while ((line = get_next_line(fd)))
+// 		printf("[Line %d]%s⤶", lines_read++, line);
+//     close(fd);
+// 	printf("\n\n");
+
+// 	printf("SINGLE EMTPY LINE\n");
+// 	printf("Should return (null)\n");
+// 	fd = open("single_emptyline.txt", O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+// 	write(fd, "", 0);
+// 	close(fd);
+
+// 	fd = open("single_emptyline.txt", O_RDONLY);
+// 	lines_read = 1;
+// 	line = get_next_line(fd);
+// 	printf("[Line %d]%s⤶", lines_read++, line);
+//     close(fd);
+// 	printf("\n\n");
+
+// 	printf("MULTI EMPTY LINE\n");
+// 	fd = open("multi_emptyline.txt", O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+// 	write(fd, "\n", 1);
+// 	write(fd, "\n", 1);
+// 	write(fd, "\n", 1);
+// 	write(fd, "", 0);
+// 	close(fd);
+
+// 	fd = open("multi_emptyline.txt", O_RDONLY);
+// 	lines_read = 1;
+// 	while ((line = get_next_line(fd)))
+// 		printf("[Line %d]%s⤶", lines_read++, line);
+//     close(fd);
+// 	printf("\n\n");
+
 // 	return (0);
 // }
 
-// int main()
+// /* EVALUATOR'S INPUT */
+// int main(void)
 // {
+//     char *line;
 // 	int fd;
-// 	char *line;
-// 	int lines;
+// 	int lines_read = 1;
 
-// 	lines = 1;
-// 	fd = open("test.txt", O_RDONLY);
-// 	printf("%d fd\n", fd);
+// 	fd = open("empty.txt", O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+// 	close(fd);
 
-// 	line = get_next_line(fd);
-// 	printf("%d->%s\n", lines++, line);
-// 	line = get_next_line(fd);
-// 	printf("%d->%s\n", lines++, line);
-// 	line = get_next_line(fd);
-// 	printf("%d->%s\n", lines++, line);
-// 	line = get_next_line(fd);
-// 	printf("%d->%s\n", lines++, line);
-// 	// line = get_next_line(fd);
-// 	// printf("%d->%s\n", lines++, line);
-// 	// line = get_next_line(-1);
-// 	// printf("%d->%s\n", lines++, line);
+// 	fd = open("empty.txt", O_RDONLY);
+// 	while ((line = get_next_line(fd)))
+// 		printf("[Line %d]%s⤶", lines_read++, line);
+//     close(fd);
+// 	printf("\n\n");
+
+//     return 0;
 // }
