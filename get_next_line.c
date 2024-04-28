@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: thopgood <thopgood@student.42.fr>          +#+  +:+       +#+        */
+/*   By: timhopgood <timhopgood@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/24 20:04:39 by timhopgood        #+#    #+#             */
-/*   Updated: 2024/04/28 14:29:09 by thopgood         ###   ########.fr       */
+/*   Updated: 2024/04/28 22:06:55 by timhopgood       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,6 +133,8 @@ char	*get_next_line(int fd)
 	int				next_line_length;
 	char			*next_line;
 
+	if (BUFFER_SIZE <= 0)
+		return (NULL);
 	ft_populate_list(&list, fd);
 	if (list == NULL)
 		return (NULL);
@@ -165,12 +167,11 @@ char	*get_next_line(int fd)
 //     /* Read lines until EOF (Ctrl+D is pressed) */
 //     while ((line = get_next_line(fd)))
 //     {
-//         printf("Next line: %s\n", line);
+//         printf("Next line: %s", line);
 //         free(line); // Free allocated memory for the line
 //     }
 
 //     printf("End of input reached. Exiting...\n");
-
 //     return 0;
 // }
 
@@ -196,7 +197,10 @@ char	*get_next_line(int fd)
 // 	lines_read = 1;
 // 	fd = open("standard_test.txt", O_RDONLY);
 // 	while ((line = get_next_line(fd)))
+// 	{
 // 		printf("[Line %d]%s⤶", lines_read++, line);
+// 		free(line);
+// 	}
 //     close(fd);
 // 	printf("\n\n");
 
@@ -205,6 +209,7 @@ char	*get_next_line(int fd)
 // 	fd = -1;
 // 	line = get_next_line(fd);
 // 	printf("[Line %d]%s⤶", lines_read++, line);
+// 	free(line);
 // 	printf("\n\n");
 
 // 	printf("READ FAIL 3RD ITERATION\n");
@@ -212,10 +217,13 @@ char	*get_next_line(int fd)
 // 	fd = open("standard_test.txt", O_RDONLY);
 // 	line = get_next_line(fd);
 // 	printf("[Line %d]%s⤶", lines_read++, line);
+// 	free(line);
 // 	line = get_next_line(fd);
 // 	printf("[Line %d]%s⤶", lines_read++, line);
+// 	free(line);
 // 	line = get_next_line(-1);
 // 	printf("[Line %d]%s⤶", lines_read++, line);
+// 	free(line);
 // 	close(fd);
 // 	printf("\n\n");
 
@@ -229,7 +237,10 @@ char	*get_next_line(int fd)
 // 	fd = open("single_longline.txt", O_RDONLY);
 // 	lines_read = 1;
 // 	while ((line = get_next_line(fd)))
+// 	{
 // 		printf("[Line %d]%s⤶", lines_read++, line);
+// 		free(line);
+// 	}
 //     close(fd);
 // 	printf("\n\n");
 
@@ -251,7 +262,10 @@ char	*get_next_line(int fd)
 // 	fd = open("multi_longline.txt", O_RDONLY);
 // 	lines_read = 1;
 // 	while ((line = get_next_line(fd)))
+// 	{
 // 		printf("[Line %d]%s⤶", lines_read++, line);
+// 		free(line);
+// 	}
 //     close(fd);
 // 	printf("\n\n");
 
@@ -263,7 +277,10 @@ char	*get_next_line(int fd)
 // 	fd = open("single_shortline.txt", O_RDONLY);
 // 	lines_read = 1;
 // 	while ((line = get_next_line(fd)))
+// 	{
 // 		printf("[Line %d]%s⤶", lines_read++, line);
+// 		free(line);
+// 	}
 //     close(fd);
 // 	printf("\n\n");
 
@@ -278,7 +295,10 @@ char	*get_next_line(int fd)
 // 	fd = open("multi_shortline.txt", O_RDONLY);
 // 	lines_read = 1;
 // 	while ((line = get_next_line(fd)))
+// 	{
 // 		printf("[Line %d]%s⤶", lines_read++, line);
+// 		free(line);
+// 	}
 //     close(fd);
 // 	printf("\n\n");
 
@@ -292,6 +312,7 @@ char	*get_next_line(int fd)
 // 	lines_read = 1;
 // 	line = get_next_line(fd);
 // 	printf("[Line %d]%s⤶", lines_read++, line);
+// 	free(line);
 //     close(fd);
 // 	printf("\n\n");
 
@@ -306,7 +327,10 @@ char	*get_next_line(int fd)
 // 	fd = open("multi_emptyline.txt", O_RDONLY);
 // 	lines_read = 1;
 // 	while ((line = get_next_line(fd)))
+// 	{
 // 		printf("[Line %d]%s⤶", lines_read++, line);
+// 		free(line);
+// 	}
 //     close(fd);
 // 	printf("\n\n");
 
@@ -325,7 +349,10 @@ char	*get_next_line(int fd)
 
 // 	fd = open("empty.txt", O_RDONLY);
 // 	while ((line = get_next_line(fd)))
+// 	{
 // 		printf("[Line %d]%s⤶", lines_read++, line);
+// 		free(line);
+// 	}
 //     close(fd);
 // 	printf("\n\n");
 

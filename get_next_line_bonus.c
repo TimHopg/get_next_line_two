@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: thopgood <thopgood@student.42.fr>          +#+  +:+       +#+        */
+/*   By: timhopgood <timhopgood@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/24 20:04:39 by timhopgood        #+#    #+#             */
-/*   Updated: 2024/04/28 15:03:13 by thopgood         ###   ########.fr       */
+/*   Updated: 2024/04/28 22:05:57 by timhopgood       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,7 +133,7 @@ char	*get_next_line(int fd)
 	int				next_line_length;
 	char			*next_line;
 
-	if (fd < 0 || 4095 < fd)
+	if (fd < 0 || 4095 < fd || BUFFER_SIZE <= 0)
 		return (NULL);
 	ft_populate_list(list, fd);
 	if (list[fd] == NULL)
@@ -154,6 +154,8 @@ char	*get_next_line(int fd)
 // # include <fcntl.h> // open/write
 // # include <sys/stat.h> // USR permissions
 // # include <stdio.h> // printf
+
+// /* ulimit -a -H: hard limits of system processes */
 
 // int	main(void)
 // {
@@ -195,30 +197,53 @@ char	*get_next_line(int fd)
 
 // 	line = get_next_line(fd1);
 // 	printf("[Line %d][File 1] %s⤶", fd1_lines++, line);
+// 	free(line);
+
 // 	line = get_next_line(fd2);
 // 	printf("[Line %d][File 2] %s⤶", fd2_lines++, line);
+// 	free(line);
+	
 // 	line = get_next_line(fd3);
 // 	printf("[Line %d][File 3] %s⤶", fd3_lines++, line);
+// 	free(line);
+
 // 	line = get_next_line(fd1);
 // 	printf("[Line %d][File 1] %s⤶", fd1_lines++, line);
+// 	free(line);
+
 // 	line = get_next_line(fd2);
 // 	printf("[Line %d][File 2] %s⤶", fd2_lines++, line);
+// 	free(line);
+
 // 	line = get_next_line(fd3);
 // 	printf("[Line %d][File 3] %s⤶", fd3_lines++, line);
+// 	free(line);
+
 // 	line = get_next_line(fd1);
 // 	printf("[Line %d][File 1] %s⤶", fd1_lines++, line);
+// 	free(line);
+
 // 	line = get_next_line(fd2);
 // 	printf("[Line %d][File 2] %s⤶", fd2_lines++, line);
+// 	free(line);
+
 // 	line = get_next_line(fd3);
 // 	printf("[Line %d][File 3] %s⤶", fd3_lines++, line);
+// 	free(line);
+
 // 	line = get_next_line(fd1);
 // 	printf("[Line %d][File 1] %s⤶", fd1_lines++, line);
+// 	free(line);
 // 	printf("\n");
+
 // 	line = get_next_line(fd2);
 // 	printf("[Line %d][File 2] %s⤶", fd2_lines++, line);
+// 	free(line);
 // 	printf("\n");
+	
 // 	line = get_next_line(fd3);
 // 	printf("[Line %d][File 3] %s⤶", fd3_lines++, line);
+// 	free(line);
 // 	printf("\n\n");
 
 // 	close(fd1);
@@ -237,31 +262,42 @@ char	*get_next_line(int fd)
 
 // 	line = get_next_line(fd1);
 // 	printf("[Line %d][File 1] %s⤶", fd1_lines++, line);
+// 	free(line);
 // 	line = get_next_line(fd2);
 // 	printf("[Line %d][File 2] %s⤶", fd2_lines++, line);
+// 	free(line);
 // 	line = get_next_line(fd3);
 // 	printf("[Line %d][File 3] %s⤶", fd3_lines++, line);
+// 	free(line);
 // 	line = get_next_line(fd1);
 // 	printf("[Line %d][File 1] %s⤶", fd1_lines++, line);
+// 	free(line);
 // 	line = get_next_line(fd2);
 // 	printf("[Line %d][File 2] %s⤶", fd2_lines++, line);
+// 	free(line);
 // 	line = get_next_line(fd3);
 // 	printf("[Line %d][File 3] %s⤶", fd3_lines++, line);
+// 	free(line);
 // 	line = get_next_line(fd1);
 // 	printf("[Line %d][File 1] %s⤶", fd1_lines++, line);
+// 	free(line);
 // 	line = get_next_line(-1);
 // 	printf("NON-EXISTING FD\n");
 // 	printf("[Line %d][File 2] %s⤶", fd2_lines++, line);
 // 	printf("\n");
 // 	line = get_next_line(fd3);
 // 	printf("[Line %d][File 3] %s⤶", fd3_lines++, line);
+// 	free(line);
 // 	line = get_next_line(fd1);
 // 	printf("[Line %d][File 1] %s⤶", fd1_lines++, line);
+// 	free(line);
 // 	printf("\n");
 // 	line = get_next_line(fd2);
 // 	printf("[Line %d][File 2] %s⤶", fd2_lines++, line);
+// 	free(line);
 // 	line = get_next_line(fd3);
 // 	printf("[Line %d][File 3] %s⤶", fd3_lines++, line);
+// 	free(line);
 // 	printf("\n");
 
 // 	close(fd1);
