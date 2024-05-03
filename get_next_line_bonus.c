@@ -6,11 +6,9 @@
 /*   By: thopgood <thopgood@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/28 22:25:17 by thopgood          #+#    #+#             */
-/*   Updated: 2024/05/03 11:35:26 by thopgood         ###   ########.fr       */
+/*   Updated: 2024/05/03 11:39:38 by thopgood         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-// ! FOPEN_MAX rgets
 
 #include "get_next_line_bonus.h"
 
