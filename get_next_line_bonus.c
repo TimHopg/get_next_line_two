@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: thopgood <thopgood@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: thopgood <thopgood@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/28 22:25:17 by thopgood          #+#    #+#             */
-/*   Updated: 2024/04/30 22:18:31 by thopgood         ###   ########.fr       */
+/*   Updated: 2024/05/03 11:32:57 by thopgood         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,11 +131,11 @@ static void	ft_populate_list(t_list **list, int fd)
 
 char	*get_next_line(int fd)
 {
-	static t_list	*list[4096];
+	static t_list	*list[1024];
 	int				next_line_length;
 	char			*next_line;
 
-	if (fd < 0 || 4095 < fd || BUFFER_SIZE <= 
+	if (fd < 0 || 1023 < fd || BUFFER_SIZE <= 0)
 		return (NULL);
 	ft_populate_list(list, fd);
 	if (list[fd] == NULL)
@@ -157,7 +157,12 @@ char	*get_next_line(int fd)
 // # include <sys/stat.h> // USR permissions
 // # include <stdio.h> // printf
 
-// /* ulimit -a -H: hard limits of system processes */
+// /*
+//  * ulimit -a -H: hard limits of system processes
+//  * FOPEN_MAX a macro of maximum number of files (not relevant)
+//  * sysconf(_SC_OPEN_MAX) in stdio.h system wide max fd
+//  * getrlimit/setrlimit process specific limits
+// */
 
 // int	main(void)
 // {

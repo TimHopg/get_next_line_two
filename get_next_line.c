@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: thopgood <thopgood@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: thopgood <thopgood@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/28 22:27:51 by thopgood          #+#    #+#             */
-/*   Updated: 2024/04/28 22:27:52 by thopgood         ###   ########.fr       */
+/*   Updated: 2024/05/03 11:16:47 by thopgood         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -337,7 +337,7 @@ char	*get_next_line(int fd)
 // 	return (0);
 // }
 
-// /* EVALUATOR'S INPUT */
+// /********* EVALUATOR'S INPUT *********/
 // int main(void)
 // {
 //     char *line;
@@ -357,4 +357,16 @@ char	*get_next_line(int fd)
 // 	printf("\n\n");
 
 //     return 0;
+// }
+
+// int main(void)
+// {
+// 	int fd;
+// 	char *line;
+
+// 	fd = open("standard_test.txt", O_RDONLY);
+// 	line = get_next_line(fd);
+// 	printf("%s\n", line);
+// 	free(line);
+// 	close(fd);
 // }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_bonus.h                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: thopgood <thopgood@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: thopgood <thopgood@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/28 22:26:33 by thopgood          #+#    #+#             */
-/*   Updated: 2024/04/28 22:26:35 by thopgood         ###   ########.fr       */
+/*   Updated: 2024/05/03 11:19:58 by thopgood         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 # include <unistd.h>
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 1
+#  define BUFFER_SIZE -1
 # endif
 
 typedef struct s_list
