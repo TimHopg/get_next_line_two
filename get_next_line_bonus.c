@@ -3,12 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: timhopgood <timhopgood@student.42.fr>      +#+  +:+       +#+        */
+/*   By: thopgood <thopgood@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/24 20:04:39 by timhopgood        #+#    #+#             */
-/*   Updated: 2024/04/28 22:05:57 by timhopgood       ###   ########.fr       */
+/*   Created: 2024/04/28 22:25:17 by thopgood          #+#    #+#             */
+/*   Updated: 2024/04/30 22:18:31 by thopgood         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+// ! FOPEN_MAX rgets
 
 #include "get_next_line_bonus.h"
 
@@ -133,7 +135,7 @@ char	*get_next_line(int fd)
 	int				next_line_length;
 	char			*next_line;
 
-	if (fd < 0 || 4095 < fd || BUFFER_SIZE <= 0)
+	if (fd < 0 || 4095 < fd || BUFFER_SIZE <= 
 		return (NULL);
 	ft_populate_list(list, fd);
 	if (list[fd] == NULL)
@@ -202,7 +204,7 @@ char	*get_next_line(int fd)
 // 	line = get_next_line(fd2);
 // 	printf("[Line %d][File 2] %s⤶", fd2_lines++, line);
 // 	free(line);
-	
+
 // 	line = get_next_line(fd3);
 // 	printf("[Line %d][File 3] %s⤶", fd3_lines++, line);
 // 	free(line);
@@ -240,7 +242,7 @@ char	*get_next_line(int fd)
 // 	printf("[Line %d][File 2] %s⤶", fd2_lines++, line);
 // 	free(line);
 // 	printf("\n");
-	
+
 // 	line = get_next_line(fd3);
 // 	printf("[Line %d][File 3] %s⤶", fd3_lines++, line);
 // 	free(line);

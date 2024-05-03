@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: timhopgood <timhopgood@student.42.fr>      +#+  +:+       +#+        */
+/*   By: thopgood <thopgood@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/24 20:04:28 by timhopgood        #+#    #+#             */
-/*   Updated: 2024/04/27 19:43:12 by timhopgood       ###   ########.fr       */
+/*   Created: 2024/04/28 22:27:21 by thopgood          #+#    #+#             */
+/*   Updated: 2024/04/28 22:27:24 by thopgood         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
